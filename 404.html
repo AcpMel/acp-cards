@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
+  <title>Virtual Business Cards | Awards Central Philippines</title>
+  
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- React 18 & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel Standalone for in-browser JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --card-bg: #000000;
+      --gold-primary: #d4af37;
+      --gold-dark: #b8860b;
+      --gold-light: #f7e7a9;
+      --gold-border: #caa148;
+      --text-white: #ffffff;
+      --text-gold: #e2ba5e;
+      --text-muted: #a3a3a3;
+      --gold-gradient: linear-gradient(135deg, #f7e7a9 0%, #d4af37 50%, #aa771c 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-white);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 90% 90%, rgba(184, 134, 11, 0.05) 0%, transparent 50%),
+        #050505;
+    }
+
+    #root {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    /* Container for pages */
+    .app-container {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Top Navigation bar */
+    .top-nav {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 0 10px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: #f7e7a9;
+      padding: 10px 18px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-btn:hover {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: var(--gold-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+    }
+
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-indicator {
+      font-size: 13px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* 3D Flip Card Container */
+    .card-scene {
+      width: 100%;
+      max-width: 680px;
+      aspect-ratio: 1.7 / 1;
+      min-height: 380px;
+      perspective: 1600px;
+      margin: 0 auto;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .card-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+      border-radius: 18px;
+      box-shadow: 
+        0 25px 60px rgba(0, 0, 0, 0.8),
+        0 0 25px rgba(212, 175, 55, 0.12);
+    }
+
+    .card-wrapper.flipped {
+      transform: rotateY(180deg);
+    }
+
+    /* Card Sides */
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      background: #000000;
+      overflow: hidden;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      display: flex;
+    }
+
+    /* Metallic Gold Waves Background */
+    .gold-waves-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .gold-wave-svg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* FRONT DESIGN */
+    .card-front {
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 2;
+    }
+
+    .front-content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+    }
+
+    .trophy-logo-wrap {
+      width: 100%;
+      max-width: 250px;
+      height: 190px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      filter: drop-shadow(0 6px 18px rgba(212, 175, 55, 0.35));
+    }
+
+    .brand-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center 25%;
+      display: block;
+    }
+
+    /* BACK DESIGN (Contact Details & QR) */
+    .card-back {
+      transform: rotateY(180deg);
+      z-index: 1;
+      display: flex;
+      padding: 38px 44px;
+      align-items: center;
+    }
+
+    .back-content {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Left Side: QR Code */
+    .back-left {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .qr-frame {
+      width: 175px;
+      height: 175px;
+      padding: 8px;
+      background: #fff;
+      border: 3px solid;
+      border-image: linear-gradient(135deg, #f7e7a9 0%, #d4af37 50%, #aa771c 100%) 1;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .qr-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Vertical Divider */
+    .vertical-divider {
+      width: 2px;
+      height: 78%;
+      background: #ffffff;
+      margin: 0 32px;
+      border-radius: 2px;
+      opacity: 0.95;
+      flex-shrink: 0;
+    }
+
+    /* Right Side: Information */
+    .back-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: left;
+    }
+
+    .user-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      line-height: 1.35;
+    }
+
+    .contact-items {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    /* Static Non-Clickable Contact Row */
+    .contact-item-static {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.2px;
+      cursor: default;
+      user-select: text;
+    }
+
+    /* Clickable Website Contact Link */
+    .contact-item-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.2px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: fit-content;
+    }
+
+    .contact-item-link:hover {
+      color: var(--gold-light);
+      transform: translateX(3px);
+    }
+
+    .contact-item-link:hover .gold-icon-box {
+      background: #e2ba5e;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    }
+
+    .gold-icon-box {
+      width: 28px;
+      height: 28px;
+      background: #c89632;
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      color: #000;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .gold-icon-box svg {
+      width: 15px;
+      height: 15px;
+      fill: #ffffff;
+    }
+
+    .contact-text {
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    /* Flip Instructions / Action Controls */
+    .card-actions-bar {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .flip-hint {
+      color: var(--gold-light);
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.9;
+    }
+
+    .flip-btn-primary {
+      background: var(--gold-gradient);
+      color: #000;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 12px 28px;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+      transition: all 0.25s;
+    }
+
+    .flip-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+      filter: brightness(1.08);
+    }
+
+    /* Directory / All Cards Page */
+    .directory-view {
+      width: 100%;
+      text-align: center;
+    }
+
+    .directory-header {
+      margin-bottom: 35px;
+    }
+
+    .directory-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #fff;
+      margin-bottom: 10px;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .directory-subtitle {
+      color: var(--text-muted);
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .directory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+      width: 100%;
+    }
+
+    .card-preview-item {
+      background: #0d0d0f;
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 14px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .card-preview-item::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gold-gradient);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card-preview-item:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold-primary);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.2);
+    }
+
+    .card-preview-item:hover::before {
+      opacity: 1;
+    }
+
+    .preview-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 2px solid var(--gold-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+      background: rgba(212, 175, 55, 0.08);
+    }
+
+    .preview-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      line-height: 1.35;
+    }
+
+    .preview-role {
+      font-size: 11px;
+      font-family: 'Poppins', sans-serif;
+      color: var(--gold-light);
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .view-card-btn {
+      font-size: 11px;
+      font-family: 'Poppins', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-top: auto;
+      transition: all 0.2s;
+    }
+
+    .card-preview-item:hover .view-card-btn {
+      border-color: var(--gold-primary);
+      background: var(--gold-primary);
+      color: #000;
+      font-weight: 600;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       MOBILE LANDSCAPE OPTIMIZATION & ROTATE HELPER
+       ═══════════════════════════════════════════════════════════════════ */
+    
+    .landscape-hint-pill {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: var(--gold-light);
+      font-family: 'Poppins', sans-serif;
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+
+    /* Phone Portrait (Orientation portrait & width under 600px) */
+    @media (max-width: 600px) and (orientation: portrait) {
+      .landscape-hint-pill {
+        display: inline-flex;
+      }
+      .card-scene {
+        aspect-ratio: 1.6 / 1;
+        min-height: 250px;
+        width: 100%;
+      }
+      .card-back {
+        padding: 16px 14px;
+      }
+      .qr-frame {
+        width: 95px;
+        height: 95px;
+        padding: 4px;
+      }
+      .vertical-divider {
+        margin: 0 12px;
+        height: 85%;
+      }
+      .user-name {
+        font-size: 11.5px;
+        letter-spacing: 0.6px;
+        margin-bottom: 8px;
+      }
+      .contact-items {
+        gap: 7px;
+      }
+      .contact-item-static,
+      .contact-item-link {
+        font-size: 9.5px;
+        gap: 8px;
+      }
+      .gold-icon-box {
+        width: 19px;
+        height: 19px;
+        border-radius: 3px;
+      }
+      .gold-icon-box svg {
+        width: 10px;
+        height: 10px;
+      }
+      .trophy-logo-wrap {
+        max-width: 170px;
+        height: 130px;
+      }
+    }
+
+    /* Phone in Landscape Mode (Height under 550px) */
+    @media (max-height: 550px) and (orientation: landscape) {
+      #root {
+        padding: 8px 14px;
+        justify-content: flex-start;
+      }
+      .top-nav {
+        margin-bottom: 8px;
+      }
+      .nav-btn {
+        padding: 6px 14px;
+        font-size: 11px;
+      }
+      .card-scene {
+        aspect-ratio: 1.7 / 1;
+        height: min(78vh, 360px);
+        min-height: 260px;
+        max-width: 600px;
+      }
+      .card-back {
+        padding: 20px 28px;
+      }
+      .qr-frame {
+        width: 135px;
+        height: 135px;
+        padding: 6px;
+      }
+      .vertical-divider {
+        margin: 0 20px;
+        height: 85%;
+      }
+      .user-name {
+        font-size: 14.5px;
+        margin-bottom: 12px;
+      }
+      .contact-items {
+        gap: 9px;
+      }
+      .contact-item-static,
+      .contact-item-link {
+        font-size: 11.5px;
+        gap: 10px;
+      }
+      .gold-icon-box {
+        width: 22px;
+        height: 22px;
+      }
+      .gold-icon-box svg {
+        width: 12px;
+        height: 12px;
+      }
+      .card-actions-bar {
+        margin-top: 10px;
+        gap: 6px;
+      }
+      .flip-btn-primary {
+        padding: 8px 20px;
+        font-size: 11px;
+      }
+      .flip-hint {
+        font-size: 10px;
+      }
+      .trophy-logo-wrap {
+        max-width: 180px;
+        height: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Elegant Luxury Gold Curved Ribbons SVG
+    function GoldRibbons() {
+      return (
+        <div className="gold-waves-bg">
+          <svg className="gold-wave-svg" viewBox="0 0 700 420" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="goldGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#fff0b3" stopOpacity="0.9" />
+                <stop offset="35%" stopColor="#d4af37" stopOpacity="0.8" />
+                <stop offset="70%" stopColor="#996515" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#d4af37" stopOpacity="0.85" />
+              </linearGradient>
+              <linearGradient id="goldGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#f3e5ab" stopOpacity="0.85" />
+                <stop offset="50%" stopColor="#aa771c" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#ffd700" stopOpacity="0.9" />
+              </linearGradient>
+            </defs>
+            {/* Top Right Luxury Wave Curves */}
+            <path d="M 460 -40 C 510 50, 560 120, 740 180" fill="none" stroke="url(#goldGrad1)" strokeWidth="6" opacity="0.85"/>
+            <path d="M 440 -30 C 500 65, 570 135, 740 210" fill="none" stroke="url(#goldGrad2)" strokeWidth="4" opacity="0.7"/>
+            <path d="M 430 -20 C 490 80, 580 150, 740 240" fill="none" stroke="url(#goldGrad1)" strokeWidth="2.5" opacity="0.6"/>
+            <path d="M 450 -50 C 520 70, 600 140, 740 160" fill="none" stroke="url(#goldGrad2)" strokeWidth="1.5" opacity="0.5"/>
+            <path d="M 420 -10 C 480 95, 590 165, 740 270" fill="none" stroke="url(#goldGrad1)" strokeWidth="1" opacity="0.4"/>
+            <path d="M 470 -35 C 530 60, 610 130, 740 195" fill="none" stroke="url(#goldGrad2)" strokeWidth="3" opacity="0.75"/>
+
+            {/* Bottom Left Luxury Wave Curves */}
+            <path d="M -40 240 C 130 260, 190 350, 260 460" fill="none" stroke="url(#goldGrad1)" strokeWidth="6" opacity="0.85"/>
+            <path d="M -30 220 C 140 245, 210 335, 290 460" fill="none" stroke="url(#goldGrad2)" strokeWidth="4" opacity="0.7"/>
+            <path d="M -20 200 C 150 230, 230 320, 320 460" fill="none" stroke="url(#goldGrad1)" strokeWidth="2.5" opacity="0.6"/>
+            <path d="M -40 260 C 120 275, 180 365, 240 460" fill="none" stroke="url(#goldGrad2)" strokeWidth="1.5" opacity="0.5"/>
+            <path d="M -10 180 C 160 215, 250 305, 350 460" fill="none" stroke="url(#goldGrad1)" strokeWidth="1" opacity="0.4"/>
+            <path d="M -25 235 C 135 255, 205 345, 275 460" fill="none" stroke="url(#goldGrad2)" strokeWidth="3" opacity="0.75"/>
+          </svg>
+        </div>
+      );
+    }
+
+    // Icons
+    const Icons = {
+      phone: () => (
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      ),
+      email: () => (
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      ),
+      location: () => (
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      ),
+      globe: () => (
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      )
+    };
+
+    // Component: Single Card Page
+    function CardPage({ card, currentIndex, totalCards, onNavigate, onBack }) {
+      const [isFlipped, setIsFlipped] = useState(false);
+
+      useEffect(() => {
+        setIsFlipped(false);
+      }, [card?.slug]);
+
+      if (!card) {
+        return (
+          <div style={{ textAlign: "center", padding: "60px 20px" }}>
+            <h2 style={{ color: "#d4af37", marginBottom: "20px" }}>Card Not Found</h2>
+            <button onClick={onBack} className="nav-btn">← Back to Directory</button>
+          </div>
+        );
+      }
+
+      const prevIndex = (currentIndex - 1 + totalCards) % totalCards;
+      const nextIndex = (currentIndex + 1) % totalCards;
+
+      const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(card.websiteUrl)}&margin=2`;
+
+      return (
+        <div className="app-container">
+          {/* Top Bar Navigation */}
+          <div className="top-nav">
+            <button onClick={onBack} className="nav-btn">
+              <span>☷</span> All Cards
+            </button>
+
+            <div className="pagination-bar">
+              <button 
+                onClick={() => onNavigate(prevIndex)} 
+                className="nav-btn"
+                title="Previous card"
+              >
+                ◀ Prev
+              </button>
+
+              <span className="page-indicator">
+                {currentIndex + 1} / {totalCards}
+              </span>
+
+              <button 
+                onClick={() => onNavigate(nextIndex)} 
+                className="nav-btn"
+                title="Next card"
+              >
+                Next ▶
+              </button>
+            </div>
+          </div>
+
+          {/* Orientation helper on phones */}
+          <div className="landscape-hint-pill">
+            <span>↺</span> Rotate to Landscape for best preview
+          </div>
+
+          {/* Interactive 3D Business Card */}
+          <div 
+            className="card-scene" 
+            onClick={() => setIsFlipped(!isFlipped)}
+            title="Click or tap to flip card"
+          >
+            <div className={`card-wrapper ${isFlipped ? "flipped" : ""}`}>
+              {/* FRONT SIDE (Brand & Centered Gold Trophy Emblem Only) */}
+              <div className="card-face card-front">
+                <GoldRibbons />
+                <div className="front-content">
+                  <div className="trophy-logo-wrap">
+                    <img 
+                      src="/logo.png" 
+                      alt="Awards Central Philippines Logo" 
+                      className="brand-logo-img" 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* BACK SIDE (Contact Details & QR Code) */}
+              <div className="card-face card-back">
+                <GoldRibbons />
+                <div className="back-content">
+                  {/* Left: QR Code in Gold Frame */}
+                  <div className="back-left">
+                    <div className="qr-frame">
+                      <img 
+                        src={qrCodeApiUrl} 
+                        alt={`QR Code for ${card.name}`} 
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Vertical Divider */}
+                  <div className="vertical-divider"></div>
+
+                  {/* Right: User Information */}
+                  <div className="back-right">
+                    <h2 className="user-name">{card.name}</h2>
+
+                    <div className="contact-items">
+                      {/* Phone - Plain static text (non-clickable) */}
+                      <div className="contact-item-static">
+                        <div className="gold-icon-box">
+                          <Icons.phone />
+                        </div>
+                        <span className="contact-text">{card.phone}</span>
+                      </div>
+
+                      {/* Email - Plain static text (non-clickable) */}
+                      <div className="contact-item-static">
+                        <div className="gold-icon-box">
+                          <Icons.email />
+                        </div>
+                        <span className="contact-text">{card.email}</span>
+                      </div>
+
+                      {/* Address - Plain static text (non-clickable) */}
+                      <div className="contact-item-static">
+                        <div className="gold-icon-box">
+                          <Icons.location />
+                        </div>
+                        <span className="contact-text">{card.address}</span>
+                      </div>
+
+                      {/* Website - The ONLY clickable link */}
+                      <a 
+                        href={card.websiteUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="contact-item-link"
+                        onClick={(e) => e.stopPropagation()}
+                        title="Visit Website"
+                      >
+                        <div className="gold-icon-box">
+                          <Icons.globe />
+                        </div>
+                        <span className="contact-text">{card.website}</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Controls below card */}
+          <div className="card-actions-bar">
+            <button 
+              className="flip-btn-primary" 
+              onClick={() => setIsFlipped(!isFlipped)}
+            >
+              ↻ {isFlipped ? "Flip to Front (Logo)" : "Flip to Back (Details)"}
+            </button>
+            <div className="flip-hint">
+              <span>✦</span> Tap or click card to flip <span>✦</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Component: Directory Page (Shows all 8 cards with links)
+    function DirectoryPage({ cards, onSelectCard }) {
+      return (
+        <div className="app-container directory-view">
+          <div className="directory-header">
+            <h1 className="directory-title">AWARDS CENTRAL PHILIPPINES</h1>
+            <p className="directory-subtitle">Select an executive business card below to open their individual page</p>
+          </div>
+
+          <div className="directory-grid">
+            {cards.map((card, idx) => {
+              const initials = card.name
+                .split(' ')
+                .filter(w => w.length > 0)
+                .map(w => w[0])
+                .slice(0, 2)
+                .join('');
+
+              return (
+                <div 
+                  key={card.id} 
+                  onClick={() => onSelectCard(card.slug)}
+                  className="card-preview-item"
+                >
+                  <div className="preview-avatar">{initials}</div>
+                  <h3 className="preview-name">{card.name}</h3>
+                  <p className="preview-role">Card #{idx + 1}</p>
+                  <span className="view-card-btn">View Card →</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // Main App with Browser History Navigation
+    function App() {
+      const [cards, setCards] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+      useEffect(() => {
+        fetch('/cards.json')
+          .then(res => res.json())
+          .then(data => {
+            setCards(data);
+            setLoading(false);
+          })
+          .catch(err => {
+            console.error("Failed to load cards.json:", err);
+            setLoading(false);
+          });
+
+        const handlePopState = () => {
+          setCurrentPath(window.location.pathname);
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+      }, []);
+
+      const navigateTo = (path) => {
+        window.history.pushState({}, '', path);
+        setCurrentPath(path);
+      };
+
+      if (loading) {
+        return (
+          <div style={{ textAlign: "center", color: "#d4af37" }}>
+            <p style={{ letterSpacing: "3px", textTransform: "uppercase", fontSize: "14px", fontFamily: "Poppins" }}>
+              Loading Luxury Cards...
+            </p>
+          </div>
+        );
+      }
+
+      // Route Matching
+      const cardMatch = currentPath.match(/^\/card\/([^\/]+)/);
+
+      if (cardMatch) {
+        const identifier = cardMatch[1];
+        const currentIndex = cards.findIndex(
+          c => String(c.id) === identifier || c.slug === identifier
+        );
+        const card = cards[currentIndex !== -1 ? currentIndex : 0];
+
+        return (
+          <CardPage 
+            card={card}
+            currentIndex={currentIndex !== -1 ? currentIndex : 0}
+            totalCards={cards.length}
+            onNavigate={(newIdx) => navigateTo(`/card/${cards[newIdx].slug}`)}
+            onBack={() => navigateTo('/')}
+          />
+        );
+      }
+
+      return (
+        <DirectoryPage 
+          cards={cards} 
+          onSelectCard={(slug) => navigateTo(`/card/${slug}`)} 
+        />
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
