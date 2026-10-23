@@ -690,6 +690,98 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
+    // Embedded Cards Data for 100% reliable offline & GitHub Pages instant loading
+    const INITIAL_CARDS = [
+      {
+        "id": 1,
+        "slug": "jerrybie-mulano",
+        "name": "JERRYBIE MULANO",
+        "phone": "0917 562 5326",
+        "phoneRaw": "+639175625326",
+        "email": "central.adtfroilan@gmail.com",
+        "address": "DM Building, #32 Visayas Avenue, Corner Congressional Avenue, Quezon City",
+        "website": "www.awardscentral.com.ph",
+        "websiteUrl": "https://www.awardscentral.com.ph"
+      },
+      {
+        "id": 2,
+        "slug": "clark-angelo-luis-torres",
+        "name": "CLARK ANGELO LUIS TORRES",
+        "phone": "0917 562 5326",
+        "phoneRaw": "+639175625326",
+        "email": "sales@awardscentral.com.ph",
+        "address": "DM Building, #32 Visayas Avenue, Corner Congressional Avenue, Quezon City",
+        "website": "www.awardscentral.com.ph",
+        "websiteUrl": "https://www.awardscentral.com.ph"
+      },
+      {
+        "id": 3,
+        "slug": "mary-shelley-biador-torres",
+        "name": "MARY SHELLEY BIADOR TORRES",
+        "phone": "0917 562 5326",
+        "phoneRaw": "+639175625326",
+        "email": "sales@awardscentral.com.ph",
+        "address": "DM Building, #32 Visayas Avenue, Corner Congressional Avenue, Quezon City",
+        "website": "www.awardscentral.com.ph",
+        "websiteUrl": "https://www.awardscentral.com.ph"
+      },
+      {
+        "id": 4,
+        "slug": "emma-marciano",
+        "name": "EMMA MARCIANO",
+        "phone": "0917 562 5326",
+        "phoneRaw": "+639175625326",
+        "email": "sales@awardscentral.com.ph",
+        "address": "DM Building, #32 Visayas Avenue, Corner Congressional Avenue, Quezon City",
+        "website": "www.awardscentral.com.ph",
+        "websiteUrl": "https://www.awardscentral.com.ph"
+      },
+      {
+        "id": 5,
+        "slug": "xena-salvatierra-biador",
+        "name": "XENA SALVATIERRA BIADOR",
+        "phone": "0917 562 5326",
+        "phoneRaw": "+639175625326",
+        "email": "sales@awardscentral.com.ph",
+        "address": "DM Building, #32 Visayas Avenue, Corner Congressional Avenue, Quezon City",
+        "website": "www.awardscentral.com.ph",
+        "websiteUrl": "https://www.awardscentral.com.ph"
+      },
+      {
+        "id": 6,
+        "slug": "bernardino-lubido-amata-iii",
+        "name": "BERNARDINO LUBIDO AMATA III",
+        "phone": "0917 562 5326",
+        "phoneRaw": "+639175625326",
+        "email": "sales@awardscentral.com.ph",
+        "address": "DM Building, #32 Visayas Avenue, Corner Congressional Avenue, Quezon City",
+        "website": "www.awardscentral.com.ph",
+        "websiteUrl": "https://www.awardscentral.com.ph"
+      },
+      {
+        "id": 7,
+        "slug": "archie-sarcilla-villano",
+        "name": "ARCHIE SARCILLA VILLANO",
+        "phone": "0917 562 5326",
+        "phoneRaw": "+639175625326",
+        "email": "sales@awardscentral.com.ph",
+        "address": "DM Building, #32 Visayas Avenue, Corner Congressional Avenue, Quezon City",
+        "website": "www.awardscentral.com.ph",
+        "websiteUrl": "https://www.awardscentral.com.ph"
+      },
+      {
+        "id": 8,
+        "slug": "froilan-dalapo",
+        "name": "FROILAN DALAPO",
+        "phone": "0917 562 5326",
+        "phoneRaw": "+639175625326",
+        "email": "sales@awardscentral.com.ph",
+        "address": "DM Building, #32 Visayas Avenue, Corner Congressional Avenue, Quezon City",
+        "website": "www.awardscentral.com.ph",
+        "websiteUrl": "https://www.awardscentral.com.ph"
+      }
+    ];
+
     // Elegant Luxury Gold Curved Ribbons SVG
     function GoldRibbons() {
       return (
@@ -945,20 +1037,20 @@
 
     // Main App with Browser History Navigation
     function App() {
-      const [cards, setCards] = useState([]);
-      const [loading, setLoading] = useState(true);
+      const [cards, setCards] = useState(INITIAL_CARDS);
       const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
       useEffect(() => {
+        // Try fetching cards.json dynamically in case user edited it, else fallback to INITIAL_CARDS
         fetch('./cards.json')
           .then(res => res.json())
           .then(data => {
-            setCards(data);
-            setLoading(false);
+            if (Array.isArray(data) && data.length > 0) {
+              setCards(data);
+            }
           })
-          .catch(err => {
-            console.error("Failed to load cards.json:", err);
-            setLoading(false);
+          .catch(() => {
+            // Silently use embedded INITIAL_CARDS
           });
 
         const handlePopState = () => {
@@ -978,16 +1070,6 @@
         window.history.pushState({}, '', fullPath);
         setCurrentPath(fullPath);
       };
-
-      if (loading) {
-        return (
-          <div style={{ textAlign: "center", color: "#d4af37" }}>
-            <p style={{ letterSpacing: "3px", textTransform: "uppercase", fontSize: "14px", fontFamily: "Poppins" }}>
-              Loading Luxury Cards...
-            </p>
-          </div>
-        );
-      }
 
       // Route Matching supporting subfolder
       const cleanPath = currentPath.replace(/^\/acp-cards/, '') || '/';
