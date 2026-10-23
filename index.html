@@ -815,7 +815,7 @@
                 <div className="front-content">
                   <div className="trophy-logo-wrap">
                     <img 
-                      src="/logo.png" 
+                      src="./logo.png" 
                       alt="Awards Central Philippines Logo" 
                       className="brand-logo-img" 
                     />
@@ -950,7 +950,7 @@
       const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
       useEffect(() => {
-        fetch('/cards.json')
+        fetch('./cards.json')
           .then(res => res.json())
           .then(data => {
             setCards(data);
@@ -968,9 +968,15 @@
         return () => window.removeEventListener('popstate', handlePopState);
       }, []);
 
+      const getBase = () => {
+        const repoName = '/acp-cards';
+        return window.location.pathname.startsWith(repoName) ? repoName : '';
+      };
+
       const navigateTo = (path) => {
-        window.history.pushState({}, '', path);
-        setCurrentPath(path);
+        const fullPath = getBase() + path;
+        window.history.pushState({}, '', fullPath);
+        setCurrentPath(fullPath);
       };
 
       if (loading) {
@@ -983,8 +989,9 @@
         );
       }
 
-      // Route Matching
-      const cardMatch = currentPath.match(/^\/card\/([^\/]+)/);
+      // Route Matching supporting subfolder
+      const cleanPath = currentPath.replace(/^\/acp-cards/, '') || '/';
+      const cardMatch = cleanPath.match(/^\/card\/([^\/]+)/);
 
       if (cardMatch) {
         const identifier = cardMatch[1];
